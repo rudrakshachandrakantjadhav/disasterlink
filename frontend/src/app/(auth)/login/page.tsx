@@ -5,12 +5,12 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth-store";
+import { roleLabel } from "@/lib/permissions";
 import { toast } from "sonner";
 
 export default function LoginPage() {
   const router = useRouter();
   const login = useAuthStore((state) => state.login);
-  const authError = useAuthStore((state) => state.error);
   const clearError = useAuthStore((state) => state.clearError);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -40,7 +40,7 @@ export default function LoginPage() {
     return newErrors;
   };
 
-  const [authError, setAuthError] = useState<string | null>(null);
+  const [loginError, setLoginError] = useState<string | null>(null);
   const [resolvedRole, setResolvedRole] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -53,21 +53,14 @@ export default function LoginPage() {
     setErrors({});
     clearError();
     setIsLoading(true);
-    setAuthError(null);
+    setLoginError(null);
 
     try {
       const result = await login(formData.identity, formData.password);
       
       if (result.success) {
-        // Map role to display label
-        const roleLabels: Record<string, string> = {
-          citizen: "Citizen Portal",
-          volunteer: "Volunteer Operations",
-          admin: "Admin Command Center",
-          district_admin: "District Admin Operations",
-          super_admin: "Super Admin Control",
-        };
-        setResolvedRole(roleLabels[useAuthStore.getState().role || "citizen"] || "Dashboard");
+        const { role, access } = useAuthStore.getState();
+        setResolvedRole(role ? roleLabel(role, access) : "dashboard");
         setSubmitStatus("success");
 
         setTimeout(() => {
@@ -76,14 +69,14 @@ export default function LoginPage() {
       } else {
         setIsLoading(false);
         setSubmitStatus("error");
-        setAuthError(result.error || "Authentication failed. Access denied.");
+        setLoginError(result.error || "Authentication failed. Access denied.");
         toast.error(result.error || "Authentication failed. Please try again.");
       }
-    } catch (err) {
+    } catch {
       setIsLoading(false);
       setSubmitStatus("error");
       const message = "An unexpected error occurred. Please try again.";
-      setAuthError(message);
+      setLoginError(message);
       toast.error(message);
     }
   };
@@ -339,27 +332,30 @@ export default function LoginPage() {
           </header>
 
           {/* Error state */}
-          {submitStatus === "error" && authError && (
+          {submitStatus === "error" && loginError && (
             <div
               style={{
-                background: "#FFF5F5",
+                background: "#FEF2F2",
                 border: "1px solid #FECACA",
                 borderRadius: "12px",
-                padding: "14px 18px",
+                padding: "16px 20px",
                 display: "flex",
                 alignItems: "center",
-                gap: "10px",
-                marginBottom: "20px",
+                gap: "12px",
+                marginBottom: "24px",
               }}
             >
               <span
                 className="material-symbols-outlined"
-                style={{ color: "#E53935", fontSize: "20px" }}
+                style={{ color: "#DC2626", fontSize: "22px" }}
                 aria-hidden="true"
               >
-                error
+                gpp_bad
               </span>
-              <p style={{ fontSize: "13px", color: "#B91C1C", margin: 0 }}>{authError}</p>
+              <div>
+                <div style={{ fontSize: "14px", fontWeight: 600, color: "#991B1B" }}>Access Denied</div>
+                <div style={{ fontSize: "12px", color: "#B91C1C" }}>{loginError}</div>
+              </div>
             </div>
           )}
 
@@ -391,36 +387,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* Error state */}
-          {submitStatus === "error" && authError && (
-            <div
-              style={{
-                background: "#FEF2F2",
-                border: "1px solid #FECACA",
-                borderRadius: "12px",
-                padding: "16px 20px",
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                marginBottom: "24px",
-              }}
-            >
-              <span
-                className="material-symbols-outlined"
-                style={{ color: "#DC2626", fontSize: "22px" }}
-                aria-hidden="true"
-              >
-                gpp_bad
-              </span>
-              <div>
-                <div style={{ fontSize: "14px", fontWeight: 600, color: "#991B1B" }}>Access Denied</div>
-                <div style={{ fontSize: "12px", color: "#B91C1C" }}>{authError}</div>
-              </div>
-            </div>
-          )}
-
           <form onSubmit={handleSubmit} noValidate style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-
             {/* Identity field */}
             <div>
               <label

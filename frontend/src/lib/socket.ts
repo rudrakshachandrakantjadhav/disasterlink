@@ -17,13 +17,11 @@ export type ServerToClientEvent =
 let socket: Socket | null = null;
 
 function getSocketUrl() {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
   return apiUrl.replace(/\/api\/?$/, "");
 }
 
 function normalizeSocketRole(role: UserRole | null) {
-  if (role === "citizen") return "survivor";
-  if (role === "district_admin" || role === "super_admin") return "admin";
   return role;
 }
 

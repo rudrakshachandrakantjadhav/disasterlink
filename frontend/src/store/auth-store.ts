@@ -1,7 +1,7 @@
 import { create } from "zustand";
-import type { UserRole } from "@/types";
+import type { UserAccess, UserRole } from "@/types";
 import type { Permission } from "@/lib/permissions";
-import { getPermissionsForRole, ROLE_REDIRECT } from "@/lib/permissions";
+import { defaultRedirect, hasPermission } from "@/lib/permissions";
 import { authService } from "@/services";
 
 // Mirror what the backend returns
@@ -11,6 +11,11 @@ export interface AuthUser {
   email: string;
   phone: string;
   role: UserRole;
+  access: UserAccess;
+  roles?: UserAccess["roles"];
+  permissions?: string[];
+  dashboards?: string[];
+  modules?: string[];
   latitude: number | null;
   longitude: number | null;
   isVerified?: boolean;
@@ -21,6 +26,7 @@ interface AuthState {
   user: AuthUser | null;
   role: UserRole | null;
   permissions: Permission[];
+  access: UserAccess | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   isHydrated: boolean;
@@ -33,7 +39,7 @@ interface AuthState {
     phone: string;
     password: string;
     role?: string;
-  }) => Promise<void>;
+  }) => Promise<{ redirectTo?: string }>;
   logout: () => Promise<void>;
   fetchMe: () => Promise<void>;
   hydrate: () => void;
@@ -45,19 +51,24 @@ interface AuthState {
 const isBrowser = typeof window !== "undefined";
 
 function getStoredToken() {
-  return isBrowser ? localStorage.getItem("dl_token") : null;
+  return isBrowser ? localStorage.getItem("disasterlink_session") || localStorage.getItem("dl_token") : null;
 }
 
 function setTokens(access: string, refresh: string) {
   if (!isBrowser) return;
   localStorage.setItem("dl_token", access);
   localStorage.setItem("dl_refresh_token", refresh);
+  localStorage.setItem("disasterlink_session", access);
+  localStorage.setItem("disasterlink_refresh", refresh);
 }
 
 function clearTokens() {
   if (!isBrowser) return;
   localStorage.removeItem("dl_token");
   localStorage.removeItem("dl_refresh_token");
+  localStorage.removeItem("disasterlink_session");
+  localStorage.removeItem("disasterlink_refresh");
+  localStorage.removeItem("disasterlink_user");
 }
 
 function extractMessage(err: unknown, fallback: string): string {
@@ -73,6 +84,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   role: null,
   permissions: [],
+  access: null,
   isAuthenticated: !!getStoredToken(),
   isLoading: false,
   isHydrated: false,
@@ -85,23 +97,24 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const { data } = await authService.login({ email, password });
-      const { user, accessToken, refreshToken } = data.data;
+      const { user, access, accessToken, refreshToken, redirectTo } = data.data;
       setTokens(accessToken, refreshToken);
       
       const role = user.role as UserRole;
-      const permissions = getPermissionsForRole(role);
+      const permissions = access.permissions ?? [];
 
       set({
-        user,
+        user: { ...user, access, permissions, roles: access.roles, dashboards: access.dashboards, modules: access.modules },
         role,
         permissions,
+        access,
         isAuthenticated: true,
         isLoading: false,
       });
 
       return {
         success: true,
-        redirectTo: ROLE_REDIRECT[role],
+        redirectTo: redirectTo ?? defaultRedirect(access),
       };
     } catch (err) {
       const message = extractMessage(err, "Login failed. Please check your credentials.");
@@ -115,19 +128,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const { data } = await authService.register(payload);
-      const { user, accessToken, refreshToken } = data.data;
+      const { user, access, accessToken, refreshToken, redirectTo } = data.data;
       setTokens(accessToken, refreshToken);
       
       const role = user.role as UserRole;
-      const permissions = getPermissionsForRole(role);
+      const permissions = access.permissions ?? [];
 
       set({
-        user,
+        user: { ...user, access, permissions, roles: access.roles, dashboards: access.dashboards, modules: access.modules },
         role,
         permissions,
+        access,
         isAuthenticated: true,
         isLoading: false,
       });
+      return { redirectTo: redirectTo ?? defaultRedirect(access) };
     } catch (err) {
       const message = extractMessage(err, "Registration failed. Please try again.");
       set({ isLoading: false, error: message, isAuthenticated: false });
@@ -144,7 +159,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // ignore server errors — always clear client state
     } finally {
       clearTokens();
-      set({ user: null, role: null, permissions: [], isAuthenticated: false });
+      set({ user: null, role: null, permissions: [], access: null, isAuthenticated: false });
     }
   },
 
@@ -154,18 +169,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: true });
     try {
       const { data } = await authService.me();
-      const user = data.data;
+      const { user, access } = data.data;
       const role = user.role as UserRole;
       set({
-        user,
+        user: { ...user, access, permissions: access.permissions, roles: access.roles, dashboards: access.dashboards, modules: access.modules },
         role,
-        permissions: getPermissionsForRole(role),
+        permissions: access.permissions ?? [],
+        access,
         isAuthenticated: true,
         isLoading: false,
       });
     } catch {
       clearTokens();
-      set({ user: null, role: null, permissions: [], isAuthenticated: false, isLoading: false });
+      set({ user: null, role: null, permissions: [], access: null, isAuthenticated: false, isLoading: false });
     }
   },
 
@@ -178,7 +194,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   hasPermission: (permission: Permission) => {
-    const { permissions } = get();
-    return permissions.includes(permission);
+    return hasPermission(get().access, permission);
   },
 }));

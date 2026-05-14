@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
+import { Prisma } from "@prisma/client";
 import { ZodError } from "zod";
 import { logger } from "../utils/logger.js";
 import { sendError } from "../utils/response.js";
@@ -25,6 +26,14 @@ export function errorHandler(error: unknown, _req: Request, res: Response, _next
   if (error instanceof AppError) {
     logger.error("Application error", { message: error.message, statusCode: error.statusCode });
     return sendError(res, error.message, error.statusCode);
+  }
+
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error.code === "P2002") {
+      const target = Array.isArray(error.meta?.target) ? error.meta.target.join(", ") : "field";
+      logger.error("Unique constraint error", { target });
+      return sendError(res, `A user with this ${target} already exists`, 409);
+    }
   }
 
   logger.error("Unhandled error", { error });

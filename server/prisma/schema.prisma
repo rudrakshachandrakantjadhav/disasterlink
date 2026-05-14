@@ -7,12 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  SURVIVOR
-  VOLUNTEER
-  ADMIN
-}
-
 enum SOSStatus {
   PENDING
   ASSIGNED
@@ -43,18 +37,133 @@ model User {
   phone            String       @unique
   email            String       @unique
   password         String
-  role             Role         @default(SURVIVOR)
+  role             String       @default("citizen")
+  primaryRoleId    String?
+  primaryRole      Role?        @relation("PrimaryRole", fields: [primaryRoleId], references: [id])
   fcmToken         String?
   latitude         Float?
   longitude        Float?
+  district         String?
+  state            String?
+  country          String?      @default("India")
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
   refreshTokens    RefreshToken[]
   sosRequests      SOSRequest[]
   volunteerProfile Volunteer?
+  roles            UserRole[]
+  auditLogs        AuditLog[]
+  activeSessions   ActiveSession[]
 
   @@index([role])
+  @@index([primaryRoleId])
+  @@index([district])
+  @@index([state])
   @@index([latitude, longitude])
+}
+
+model Role {
+  id              String           @id @default(uuid())
+  slug            String           @unique
+  name            String
+  description     String?
+  hierarchyLevel  Int              @default(10)
+  accessScope     String           @default("local")
+  isSystem        Boolean          @default(false)
+  isActive        Boolean          @default(true)
+  modules         Json             @default("[]")
+  dashboards      Json             @default("[]")
+  crud            Json             @default("{}")
+  geographicScope Json             @default("{}")
+  featureAccess   Json             @default("[]")
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  primaryUsers    User[]           @relation("PrimaryRole")
+  users           UserRole[]
+  permissions     RolePermission[]
+
+  @@index([hierarchyLevel])
+  @@index([accessScope])
+}
+
+model Permission {
+  id          String           @id @default(uuid())
+  key         String           @unique
+  module      String
+  action      String
+  description String?
+  isSystem    Boolean          @default(true)
+  createdAt   DateTime         @default(now())
+  roles       RolePermission[]
+
+  @@index([module])
+}
+
+model UserRole {
+  id          String   @id @default(uuid())
+  userId      String
+  roleId      String
+  district    String?
+  state       String?
+  country     String?  @default("India")
+  assignedBy  String?
+  assignedAt  DateTime @default(now())
+  expiresAt   DateTime?
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
+  @@index([district])
+  @@index([state])
+}
+
+model RolePermission {
+  id           String     @id @default(uuid())
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  role      String?
+  action    String
+  module    String
+  severity  String   @default("INFO")
+  location  String?
+  ip        String?
+  device    String?
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([module])
+  @@index([severity])
+  @@index([createdAt])
+}
+
+model ActiveSession {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshToken String   @unique
+  ip           String?
+  device       String?
+  createdAt    DateTime @default(now())
+  lastSeenAt   DateTime @default(now())
+  expiresAt    DateTime
+
+  @@index([userId])
+  @@index([lastSeenAt])
 }
 
 model SOSRequest {

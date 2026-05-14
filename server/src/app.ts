@@ -14,6 +14,8 @@ import { shelterRouter } from "./routes/shelter.routes.js";
 import { alertRouter } from "./routes/alert.routes.js";
 import { adminRouter } from "./routes/admin.routes.js";
 import { mapRouter } from "./routes/map.routes.js";
+import { rolesRouter } from "./modules/roles/roles.routes.js";
+import { permissionsRouter } from "./modules/permissions/permissions.routes.js";
 import { initSocket } from "./sockets/index.js";
 
 const app = express();
@@ -63,6 +65,8 @@ app.use("/api/shelters", shelterRouter);
 app.use("/api/alerts", alertRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/map", mapRouter);
+app.use("/api/roles", rolesRouter);
+app.use("/api/permissions", permissionsRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

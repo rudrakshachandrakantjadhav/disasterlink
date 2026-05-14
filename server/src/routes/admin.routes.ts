@@ -1,14 +1,13 @@
 import { Router } from "express";
-import { Role } from "@prisma/client";
 import { analytics, broadcast, heatmap, incidents, volunteers } from "../controllers/admin.controller.js";
 import { requireAuth } from "../middleware/auth.middleware.js";
-import { requireRole } from "../middleware/role.middleware.js";
+import { requirePermission } from "../middleware/role.middleware.js";
 
 export const adminRouter = Router();
 
-adminRouter.use(requireAuth, requireRole(Role.ADMIN));
-adminRouter.get("/analytics", analytics);
-adminRouter.get("/incidents", incidents);
-adminRouter.get("/volunteers", volunteers);
-adminRouter.post("/broadcast", broadcast);
-adminRouter.get("/heatmap", heatmap);
+adminRouter.use(requireAuth);
+adminRouter.get("/analytics", requirePermission("analytics.view", "analytics.national"), analytics);
+adminRouter.get("/incidents", requirePermission("incidents.view", "incidents.manage"), incidents);
+adminRouter.get("/volunteers", requirePermission("volunteers.view", "volunteers.manage"), volunteers);
+adminRouter.post("/broadcast", requirePermission("alerts.broadcast", "emergency.override"), broadcast);
+adminRouter.get("/heatmap", requirePermission("map.full_access", "analytics.view"), heatmap);

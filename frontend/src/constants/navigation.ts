@@ -9,30 +9,31 @@ export const publicNav: NavItem[] = [
 ];
 
 export const dashboardNav: NavItem[] = [
-  { title: "Overview", href: "/dashboard", icon: "LayoutDashboard" },
-  { title: "SOS Emergency", href: "/dashboard/sos", icon: "Siren" },
-  { title: "Emergency Feed", href: "/dashboard/feed", icon: "Radio" },
-  { title: "My Requests", href: "/dashboard/requests", icon: "FileText" },
-  { title: "Live Map", href: "/dashboard/map", icon: "Map" },
+  { title: "Overview", href: "/dashboard", icon: "LayoutDashboard", module: "dashboard" },
+  { title: "SOS Emergency", href: "/dashboard/sos", icon: "Siren", requiredPermissions: ["sos.create"] },
+  { title: "Emergency Feed", href: "/dashboard/feed", icon: "Radio", requiredPermissions: ["alerts.view"] },
+  { title: "My Requests", href: "/dashboard/requests", icon: "FileText", requiredPermissions: ["sos.view_own"] },
+  { title: "Live Map", href: "/dashboard/map", icon: "Map", requiredPermissions: ["map.view", "map.full_access"] },
   { title: "Profile", href: "/dashboard/profile", icon: "UserCircle" },
 ];
 
 export const volunteerNav: NavItem[] = [
-  { title: "Command Center", href: "/volunteer", icon: "Shield" },
-  { title: "My Tasks", href: "/volunteer/tasks", icon: "ClipboardList" },
-  { title: "Navigation", href: "/volunteer/navigate", icon: "Navigation" },
+  { title: "Command Center", href: "/volunteer", icon: "Shield", module: "volunteer" },
+  { title: "My Tasks", href: "/volunteer/tasks", icon: "ClipboardList", requiredPermissions: ["volunteers.respond", "volunteers.manage"] },
+  { title: "Navigation", href: "/volunteer/navigate", icon: "Navigation", requiredPermissions: ["volunteers.respond", "map.view"] },
   { title: "Profile", href: "/dashboard/profile", icon: "UserCircle" },
 ];
 
 export const adminNav: NavItem[] = [
-  { title: "Operations Center", href: "/admin", icon: "Activity" },
-  { title: "Incidents", href: "/admin/incidents", icon: "AlertTriangle" },
-  { title: "Shelters", href: "/admin/shelters", icon: "Home" },
-  { title: "Volunteers", href: "/admin/volunteers", icon: "Users" },
-  { title: "User Management", href: "/admin/users", icon: "Shield" },
-  { title: "Analytics", href: "/admin/analytics", icon: "BarChart3" },
-  { title: "Alert Commander", href: "/admin/notifications", icon: "Bell" },
-  { title: "Audit Logs", href: "/admin/audit", icon: "FileText" },
+  { title: "Super Command", href: "/admin/super", icon: "Shield", requiredPermissions: ["roles.manage", "config.manage"] },
+  { title: "Operations Center", href: "/admin", icon: "Activity", module: "admin" },
+  { title: "Incidents", href: "/admin/incidents", icon: "AlertTriangle", requiredPermissions: ["incidents.view", "incidents.manage"] },
+  { title: "Shelters", href: "/admin/shelters", icon: "Home", requiredPermissions: ["shelters.manage", "shelters.create"] },
+  { title: "Volunteers", href: "/admin/volunteers", icon: "Users", requiredPermissions: ["volunteers.view", "volunteers.manage"] },
+  { title: "User Management", href: "/admin/users", icon: "Shield", requiredPermissions: ["users.view", "users.edit"] },
+  { title: "Analytics", href: "/admin/analytics", icon: "BarChart3", requiredPermissions: ["analytics.view", "analytics.national"] },
+  { title: "Alert Commander", href: "/admin/notifications", icon: "Bell", requiredPermissions: ["alerts.broadcast", "notifications.manage"] },
+  { title: "Audit Logs", href: "/admin/audit", icon: "FileText", requiredPermissions: ["audit.view", "roles.manage"] },
 ];
 
 export const SITE_CONFIG = {

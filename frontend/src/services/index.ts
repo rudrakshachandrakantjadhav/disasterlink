@@ -145,6 +145,22 @@ export const adminService = {
 };
 
 // ============================================
+// RBAC / SUPER ADMIN SERVICE
+// ============================================
+export const roleService = {
+  getRoles: async () => api.get("/roles"),
+  getRole: async (slug: string) => api.get(`/roles/${slug}`),
+  createRole: async (data: Record<string, unknown>) => api.post("/roles", data),
+  updateRole: async (slug: string, data: Record<string, unknown>) => api.patch(`/roles/${slug}`, data),
+  deleteRole: async (slug: string) => api.delete(`/roles/${slug}`),
+  assignRole: async (data: { userId: string; roleSlug: string; district?: string; state?: string; country?: string }) =>
+    api.post("/roles/assign", data),
+  getPermissions: async () => api.get("/roles/permissions"),
+  getAuditLogs: async () => api.get("/roles/audit"),
+  getSessions: async () => api.get("/roles/sessions"),
+};
+
+// ============================================
 // MAP SERVICE
 // ============================================
 export const mapService = {

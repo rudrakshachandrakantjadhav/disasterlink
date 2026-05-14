@@ -25,8 +25,13 @@ export async function createAlert(req: Request, res: Response) {
   const alert = await prisma.alert.create({ data: input });
   const users = await prisma.user.findMany({ select: { fcmToken: true, phone: true } });
   await broadcastAlert(alert, users);
-  emitToRole("survivor", "emergency-alert", alert);
+  emitToRole("citizen", "emergency-alert", alert);
   emitToRole("volunteer", "emergency-alert", alert);
+  emitToRole("district_coordinator", "emergency-alert", alert);
+  emitToRole("district_admin", "emergency-alert", alert);
+  emitToRole("state_admin", "emergency-alert", alert);
+  emitToRole("national_admin", "emergency-alert", alert);
+  emitToRole("super_admin", "emergency-alert", alert);
   return sendSuccess(res, alert, "Alert broadcast", 201);
 }
 

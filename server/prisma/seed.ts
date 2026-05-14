@@ -1,6 +1,7 @@
 import "dotenv/config";
 import bcrypt from "bcryptjs";
-import { PrismaClient, Role, Severity, SOSStatus, SOSType } from "@prisma/client";
+import { PrismaClient, Severity, SOSStatus, SOSType } from "@prisma/client";
+import { ensureDefaultRbac } from "../src/modules/roles/roles.service.js";
 
 const prisma = new PrismaClient();
 
@@ -14,16 +15,41 @@ async function main() {
   const password = await bcrypt.hash("DisasterLink@123", 12);
 
   await prisma.refreshToken.deleteMany();
+  await prisma.activeSession.deleteMany();
+  await prisma.auditLog.deleteMany();
   await prisma.sOSRequest.deleteMany();
   await prisma.volunteer.deleteMany();
+  await prisma.userRole.deleteMany();
   await prisma.alert.deleteMany();
   await prisma.shelter.deleteMany();
   await prisma.user.deleteMany();
+  await prisma.rolePermission.deleteMany();
+  await prisma.permission.deleteMany();
+  await prisma.role.deleteMany();
+
+  await ensureDefaultRbac();
+
+  const roles = Object.fromEntries(
+    (await prisma.role.findMany()).map((role) => [role.slug, role])
+  );
 
   const admins = await Promise.all(
-    [1, 2, 3].map((i) =>
+    [
+      { name: "Super Admin", email: "superadmin@disasterlink.app", phone: "+919900000001", role: roles.super_admin },
+      { name: "National Admin", email: "national@disasterlink.app", phone: "+919900000002", role: roles.national_admin },
+      { name: "State Admin", email: "state@disasterlink.app", phone: "+919900000003", role: roles.state_admin }
+    ].map((admin) =>
       prisma.user.create({
-        data: { name: `Admin ${i}`, phone: `+91990000000${i}`, email: `admin${i}@disasterlink.app`, password, role: Role.ADMIN }
+        data: {
+          name: admin.name,
+          phone: admin.phone,
+          email: admin.email,
+          password,
+          role: admin.role.slug,
+          primaryRoleId: admin.role.id,
+          state: "Maharashtra",
+          roles: { create: { roleId: admin.role.id, state: "Maharashtra", country: "India" } }
+        }
       })
     )
   );
@@ -37,9 +63,13 @@ async function main() {
           phone: `+9198000000${String(i + 1).padStart(2, "0")}`,
           email: `volunteer${i + 1}@disasterlink.app`,
           password,
-          role: Role.VOLUNTEER,
+          role: roles.volunteer.slug,
+          primaryRoleId: roles.volunteer.id,
+          roles: { create: { roleId: roles.volunteer.id, district: place.name, state: "Maharashtra", country: "India" } },
           latitude: place.latitude + i * 0.01,
           longitude: place.longitude + i * 0.01,
+          district: place.name,
+          state: "Maharashtra",
           volunteerProfile: { create: { isAvailable: i % 4 !== 0 } }
         },
         include: { volunteerProfile: true }
@@ -56,9 +86,13 @@ async function main() {
           phone: `+9177000000${String(i + 1).padStart(2, "0")}`,
           email: `survivor${i + 1}@disasterlink.app`,
           password,
-          role: Role.SURVIVOR,
+          role: roles.citizen.slug,
+          primaryRoleId: roles.citizen.id,
+          roles: { create: { roleId: roles.citizen.id, district: place.name, state: "Maharashtra", country: "India" } },
           latitude: place.latitude - i * 0.01,
-          longitude: place.longitude - i * 0.01
+          longitude: place.longitude - i * 0.01,
+          district: place.name,
+          state: "Maharashtra"
         }
       });
     })
@@ -116,7 +150,7 @@ async function main() {
     ]
   });
 
-  console.log(`Seeded DisasterLink demo data. Login with ${admins[0].email} / DisasterLink@123`);
+  console.log(`Seeded DisasterLink demo data. Super Admin login: ${admins[0].email} / DisasterLink@123`);
 }
 
 main().finally(async () => prisma.$disconnect());

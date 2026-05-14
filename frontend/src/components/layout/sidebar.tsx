@@ -26,7 +26,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useNotificationStore } from "@/store/notification-store";
 import { useAuthStore } from "@/store/auth-store";
-import { ROLE_LABELS, ROLE_BADGE_COLORS } from "@/lib/permissions";
+import { filterNavItems, roleBadgeClass, roleLabel } from "@/lib/permissions";
 import type { NavItem } from "@/types";
 import { useRouter } from "next/navigation";
 
@@ -58,7 +58,8 @@ export function Sidebar({ navItems, title, subtitle }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { sidebarOpen, toggleSidebar, unreadCount } = useNotificationStore();
-  const { user, logout } = useAuthStore();
+  const { user, access, logout } = useAuthStore();
+  const visibleNavItems = filterNavItems(navItems, access);
 
   const handleLogout = () => {
     logout();
@@ -111,7 +112,7 @@ export function Sidebar({ navItems, title, subtitle }: SidebarProps) {
 
         {/* Nav Items */}
         <nav className="flex-1 overflow-y-auto py-2 px-2" aria-label={title}>
-          {navItems.map((item) => {
+          {visibleNavItems.map((item) => {
             const isActive =
               item.href === pathname ||
               (item.href !== "/" &&
@@ -171,8 +172,8 @@ export function Sidebar({ navItems, title, subtitle }: SidebarProps) {
                 <p className="text-xs font-semibold text-on-surface truncate">
                   {user.name}
                 </p>
-                <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${ROLE_BADGE_COLORS[user.role]?.bg || ''} ${ROLE_BADGE_COLORS[user.role]?.text || ''}`}>
-                  {ROLE_LABELS[user.role] || user.role}
+                <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${roleBadgeClass(user.role)}`}>
+                  {roleLabel(user.role, access)}
                 </span>
               </div>
               <button
@@ -189,7 +190,7 @@ export function Sidebar({ navItems, title, subtitle }: SidebarProps) {
 
       {/* Mobile Bottom Nav */}
       <nav className="fixed bottom-0 left-0 right-0 z-[100] flex lg:hidden items-stretch border-t border-outline-variant bg-surface-container-lowest pb-safe shadow-[0_-4px_12px_rgba(0,0,0,0.08)] h-[72px]">
-        {navItems.slice(0, 5).map((item) => {
+        {visibleNavItems.slice(0, 5).map((item) => {
           const isActive =
             item.href === pathname ||
             (item.href !== "/" && pathname.startsWith(item.href));

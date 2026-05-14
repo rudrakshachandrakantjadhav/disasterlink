@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth-store";
 import { toast } from "sonner";
 
-type Role = "SURVIVOR" | "VOLUNTEER";
+type Role = "citizen" | "volunteer";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -14,7 +14,7 @@ export default function RegisterPage() {
   const authError = useAuthStore((state) => state.error);
   const clearError = useAuthStore((state) => state.clearError);
 
-  const [role, setRole] = useState<Role>("SURVIVOR");
+  const [role, setRole] = useState<Role>("citizen");
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -52,7 +52,7 @@ export default function RegisterPage() {
     clearError();
     setIsLoading(true);
     try {
-      await register({
+      const result = await register({
         name: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
         email: formData.email,
         phone: formData.phone,
@@ -60,10 +60,10 @@ export default function RegisterPage() {
         role,
       });
       toast.success("Account created! Redirecting…");
-      setTimeout(() => router.push("/dashboard"), 1200);
+      setTimeout(() => router.push(result.redirectTo ?? "/dashboard"), 1200);
     } catch {
       setIsLoading(false);
-      toast.error(authError ?? "Registration failed. Please try again.");
+      toast.error(useAuthStore.getState().error ?? authError ?? "Registration failed. Please try again.");
     }
   };
 
@@ -131,8 +131,8 @@ export default function RegisterPage() {
                     className="peer sr-only"
                     name="role"
                     type="radio"
-                    checked={role === "VOLUNTEER"}
-                    onChange={() => setRole("VOLUNTEER")}
+                    checked={role === "volunteer"}
+                    onChange={() => setRole("volunteer")}
                   />
                   <div className="p-6 border border-outline-variant bg-surface rounded-xl peer-checked:border-primary peer-checked:bg-secondary-container transition-all">
                     <div className="flex items-center justify-between mb-2">
@@ -141,7 +141,7 @@ export default function RegisterPage() {
                       </span>
                       <div
                         className={`w-4 h-4 rounded-full border-2 ${
-                          role === "VOLUNTEER" ? "border-primary bg-primary" : "border-outline-variant"
+                          role === "volunteer" ? "border-primary bg-primary" : "border-outline-variant"
                         }`}
                       />
                     </div>
@@ -156,8 +156,8 @@ export default function RegisterPage() {
                     className="peer sr-only"
                     name="role"
                     type="radio"
-                    checked={role === "SURVIVOR"}
-                    onChange={() => setRole("SURVIVOR")}
+                    checked={role === "citizen"}
+                    onChange={() => setRole("citizen")}
                   />
                   <div className="p-6 border border-outline-variant bg-surface rounded-xl peer-checked:border-primary peer-checked:bg-secondary-container transition-all">
                     <div className="flex items-center justify-between mb-2">
@@ -166,7 +166,7 @@ export default function RegisterPage() {
                       </span>
                       <div
                         className={`w-4 h-4 rounded-full border-2 ${
-                          role === "SURVIVOR" ? "border-primary bg-primary" : "border-outline-variant"
+                          role === "citizen" ? "border-primary bg-primary" : "border-outline-variant"
                         }`}
                       />
                     </div>

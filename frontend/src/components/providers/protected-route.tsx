@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/auth-store";
-import { canAccessRoute, ROLE_REDIRECT } from "@/lib/permissions";
+import { canAccessRoute, defaultRedirect } from "@/lib/permissions";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -20,7 +20,7 @@ interface ProtectedRouteProps {
 export default function ProtectedRoute({ children, showLoader = true }: ProtectedRouteProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { isAuthenticated, isHydrated, role, hydrate } = useAuthStore();
+  const { isAuthenticated, isHydrated, access, hydrate } = useAuthStore();
 
   // Hydrate session from localStorage on mount
   useEffect(() => {
@@ -35,12 +35,12 @@ export default function ProtectedRoute({ children, showLoader = true }: Protecte
       return;
     }
 
-    if (role && !canAccessRoute(role, pathname)) {
+    if (!canAccessRoute(access, pathname)) {
       // User is authenticated but not authorized for this route
-      const correctPath = ROLE_REDIRECT[role];
+      const correctPath = defaultRedirect(access);
       router.replace(correctPath);
     }
-  }, [isAuthenticated, isHydrated, role, pathname, router]);
+  }, [access, isAuthenticated, isHydrated, pathname, router]);
 
   // Show loading while hydrating
   if (!isHydrated && showLoader) {
@@ -60,7 +60,7 @@ export default function ProtectedRoute({ children, showLoader = true }: Protecte
 
   // If not authenticated or unauthorized, don't render (redirect will happen)
   if (!isAuthenticated) return null;
-  if (role && !canAccessRoute(role, pathname)) return null;
+  if (!canAccessRoute(access, pathname)) return null;
 
   return <>{children}</>;
 }

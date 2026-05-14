@@ -1,13 +1,15 @@
 // ============================================
 // User Types
 // ============================================
-export type UserRole = "citizen" | "volunteer" | "admin" | "district_admin" | "super_admin";
+export type UserRole = string;
 
 export interface User {
   id: string;
   name: string;
   email: string;
   role: UserRole;
+  roles?: AccessRole[];
+  access?: UserAccess;
   phone?: string;
   avatar?: string;
   location?: Coordinates;
@@ -182,7 +184,30 @@ export interface NavItem {
   href: string;
   icon?: string;
   badge?: number;
+  module?: string;
+  requiredPermissions?: string[];
   children?: NavItem[];
+}
+
+export interface AccessRole {
+  id: string;
+  slug: string;
+  name: string;
+  hierarchyLevel: number;
+  accessScope: string;
+  modules: string[];
+  dashboards: string[];
+  crud: Record<string, string[]>;
+}
+
+export interface UserAccess {
+  primaryRole: string;
+  roles: AccessRole[];
+  permissions: string[];
+  hierarchyLevel: number;
+  accessScope: string;
+  dashboards: string[];
+  modules: string[];
 }
 
 // ============================================

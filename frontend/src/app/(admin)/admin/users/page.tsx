@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { MANAGED_USERS, type ManagedUser } from "@/lib/auth";
-import { ROLE_LABELS, ROLE_BADGE_COLORS } from "@/lib/permissions";
+import { roleBadgeClass, roleLabel } from "@/lib/permissions";
 import type { UserRole } from "@/types";
 
 export default function UserManagementPage() {
@@ -39,7 +39,11 @@ export default function UserManagementPage() {
   const toggleSelect = (id: string) => {
     setSelectedUsers((prev) => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
       return next;
     });
   };
@@ -184,7 +188,6 @@ export default function UserManagementPage() {
             </thead>
             <tbody className="divide-y divide-outline-variant">
               {paged.map((user) => {
-                const roleBadge = ROLE_BADGE_COLORS[user.role];
                 return (
                   <tr key={user.id} className="hover:bg-surface-container-low transition-colors">
                     <td className="px-4 py-3">
@@ -210,7 +213,7 @@ export default function UserManagementPage() {
                       <select
                         value={user.role}
                         onChange={(e) => handleRoleChange(user.id, e.target.value as UserRole)}
-                        className={`text-[11px] font-bold uppercase px-2 py-1 rounded ${roleBadge.bg} ${roleBadge.text} border-none outline-none cursor-pointer`}
+                        className={`text-[11px] font-bold uppercase px-2 py-1 rounded ${roleBadgeClass(user.role)} border-none outline-none cursor-pointer`}
                       >
                         <option value="citizen">Citizen</option>
                         <option value="volunteer">Volunteer</option>
@@ -313,11 +316,10 @@ export default function UserManagementPage() {
         <h3 className="text-label-caps text-on-surface-variant mb-3">ROLE HIERARCHY & ACCESS LEVELS</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           {(["super_admin", "admin", "district_admin", "volunteer", "citizen"] as UserRole[]).map((role) => {
-            const badge = ROLE_BADGE_COLORS[role];
             return (
               <div key={role} className="flex items-center gap-2 p-2 rounded bg-surface-container-low">
-                <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${badge.bg} ${badge.text}`}>
-                  {ROLE_LABELS[role]}
+                <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${roleBadgeClass(role)}`}>
+                  {roleLabel(role)}
                 </span>
               </div>
             );
