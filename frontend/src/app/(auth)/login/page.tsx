@@ -5,10 +5,13 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth-store";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const router = useRouter();
   const login = useAuthStore((state) => state.login);
+  const authError = useAuthStore((state) => state.error);
+  const clearError = useAuthStore((state) => state.clearError);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -44,14 +47,17 @@ export default function LoginPage() {
       return;
     }
     setErrors({});
+    clearError();
     setIsLoading(true);
-    // Authenticate and redirect
-    await login(formData.identity, formData.password);
-    setIsLoading(false);
-    setSubmitStatus("success");
-    setTimeout(() => {
-      router.push("/dashboard");
-    }, 1500);
+    try {
+      await login(formData.identity, formData.password);
+      setSubmitStatus("success");
+      setTimeout(() => router.push("/dashboard"), 1200);
+    } catch {
+      setIsLoading(false);
+      setSubmitStatus("error");
+      toast.error(authError ?? "Authentication failed. Please try again.");
+    }
   };
 
   const handleChange = (field: string, value: string | boolean) => {
@@ -303,6 +309,31 @@ export default function LoginPage() {
               Authorized personnel only. Federal access protocols active.
             </p>
           </header>
+
+          {/* Error state */}
+          {submitStatus === "error" && authError && (
+            <div
+              style={{
+                background: "#FFF5F5",
+                border: "1px solid #FECACA",
+                borderRadius: "12px",
+                padding: "14px 18px",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                marginBottom: "20px",
+              }}
+            >
+              <span
+                className="material-symbols-outlined"
+                style={{ color: "#E53935", fontSize: "20px" }}
+                aria-hidden="true"
+              >
+                error
+              </span>
+              <p style={{ fontSize: "13px", color: "#B91C1C", margin: 0 }}>{authError}</p>
+            </div>
+          )}
 
           {/* Success state */}
           {submitStatus === "success" && (
