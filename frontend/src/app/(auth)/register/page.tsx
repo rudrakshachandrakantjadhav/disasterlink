@@ -70,7 +70,7 @@ export default function RegisterPage() {
                 </div>
                 <div className="flex flex-col gap-1"><label className="text-label-caps text-on-surface-variant">Email Address (Government/Agency Preferred)</label><input className="w-full p-4 border border-outline-variant rounded-lg focus:ring-0 focus:border-primary bg-surface-container-lowest text-body-base" placeholder="j.doe@agency.gov" type="email"/></div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-1"><label className="text-label-caps text-on-surface-variant">Contact Number</label><input className="w-full p-4 border border-outline-variant rounded-lg focus:ring-0 focus:border-primary bg-surface-container-lowest text-body-base" placeholder="+1 (555) 000-0000" type="tel"/><p className="text-body-sm text-outline">Used for critical SMS alerts only.</p></div>
+                  <div className="flex flex-col gap-1"><label className="text-label-caps text-on-surface-variant">Contact Number</label><input className="w-full p-4 border border-outline-variant rounded-lg focus:ring-0 focus:border-primary bg-surface-container-lowest text-body-base" placeholder="+91 98765 00000" type="tel"/><p className="text-body-sm text-outline">Used for critical SMS alerts only.</p></div>
                   <div className="flex flex-col gap-1"><label className="text-label-caps text-on-surface-variant">Date of Birth</label><input className="w-full p-4 border border-outline-variant rounded-lg focus:ring-0 focus:border-primary bg-surface-container-lowest text-body-base" type="date"/></div>
                 </div>
               </div>

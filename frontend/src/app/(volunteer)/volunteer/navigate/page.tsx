@@ -37,7 +37,7 @@ export default function NavigatePage() {
               <span className="text-mono-data text-on-surface-variant">ETA: 12 min</span>
             </div>
             <h3 className="text-title-sm text-on-surface mb-1">To: Water Distribution Point C</h3>
-            <p className="text-body-sm text-on-surface-variant mb-3">North Community Center, Sector C-3</p>
+            <p className="text-body-sm text-on-surface-variant mb-3">Andheri Sports Complex, Zone K/W</p>
             <div className="flex gap-4 text-body-sm">
               <span className="flex items-center gap-1 text-on-surface-variant"><span className="material-symbols-outlined text-sm">straighten</span>2.4 km</span>
               <span className="flex items-center gap-1 text-on-surface-variant"><span className="material-symbols-outlined text-sm">traffic</span>Light traffic</span>

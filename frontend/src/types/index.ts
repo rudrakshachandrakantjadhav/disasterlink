@@ -1,7 +1,7 @@
 // ============================================
 // User Types
 // ============================================
-export type UserRole = "citizen" | "volunteer" | "admin" | "coordinator";
+export type UserRole = "citizen" | "volunteer" | "admin" | "district_admin" | "super_admin";
 
 export interface User {
   id: string;
@@ -11,7 +11,10 @@ export interface User {
   phone?: string;
   avatar?: string;
   location?: Coordinates;
+  district?: string;
+  permissions?: string[];
   isVerified: boolean;
+  lastActive?: string;
   createdAt: string;
 }
 

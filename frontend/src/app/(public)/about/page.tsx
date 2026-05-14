@@ -99,7 +99,7 @@ export default function AboutPage() {
               <div>
                 <h3 className="text-headline-md text-primary mb-2">42+</h3>
                 <p className="text-label-caps text-on-surface">NGO Partnerships</p>
-                <p className="text-body-sm text-on-surface-variant mt-4">Including Red Cross, WHO, and FEMA logistics nodes.</p>
+                <p className="text-body-sm text-on-surface-variant mt-4">Including Indian Red Cross, WHO, and NDMA logistics nodes.</p>
               </div>
             </div>
 

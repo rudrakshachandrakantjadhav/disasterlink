@@ -21,11 +21,14 @@ import {
   UserCircle,
   ClipboardList,
   Navigation,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNotificationStore } from "@/store/notification-store";
 import { useAuthStore } from "@/store/auth-store";
+import { ROLE_LABELS, ROLE_BADGE_COLORS } from "@/lib/permissions";
 import type { NavItem } from "@/types";
+import { useRouter } from "next/navigation";
 
 const iconMap: Record<string, React.ElementType> = {
   Activity,
@@ -42,6 +45,7 @@ const iconMap: Record<string, React.ElementType> = {
   Bell,
   ClipboardList,
   Navigation,
+  Shield,
 };
 
 interface SidebarProps {
@@ -52,8 +56,14 @@ interface SidebarProps {
 
 export function Sidebar({ navItems, title, subtitle }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const { sidebarOpen, toggleSidebar, unreadCount } = useNotificationStore();
   const { user, logout } = useAuthStore();
+
+  const handleLogout = () => {
+    logout();
+    router.push("/login");
+  };
 
   return (
     <>
@@ -161,12 +171,12 @@ export function Sidebar({ navItems, title, subtitle }: SidebarProps) {
                 <p className="text-xs font-semibold text-on-surface truncate">
                   {user.name}
                 </p>
-                <p className="text-[11px] text-on-surface-variant truncate">
-                  {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                </p>
+                <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${ROLE_BADGE_COLORS[user.role]?.bg || ''} ${ROLE_BADGE_COLORS[user.role]?.text || ''}`}>
+                  {ROLE_LABELS[user.role] || user.role}
+                </span>
               </div>
               <button
-                onClick={logout}
+                onClick={handleLogout}
                 className="flex h-7 w-7 items-center justify-center rounded text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors"
                 title="Sign out"
               >
@@ -178,21 +188,33 @@ export function Sidebar({ navItems, title, subtitle }: SidebarProps) {
       </aside>
 
       {/* Mobile Bottom Nav */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 flex lg:hidden items-center justify-around h-16 border-t border-outline-variant bg-surface-container-lowest">
+      <nav className="fixed bottom-0 left-0 right-0 z-[100] flex lg:hidden items-stretch border-t border-outline-variant bg-surface-container-lowest pb-safe shadow-[0_-4px_12px_rgba(0,0,0,0.08)] h-[72px]">
         {navItems.slice(0, 5).map((item) => {
-          const isActive = item.href === pathname;
+          const isActive =
+            item.href === pathname ||
+            (item.href !== "/" && pathname.startsWith(item.href));
           const Icon = item.icon ? iconMap[item.icon] : Activity;
+          
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={cn(
-                "flex flex-col items-center justify-center gap-0.5 px-3 py-1 min-w-[48px] min-h-[48px]",
-                isActive ? "text-primary" : "text-on-surface-variant"
-              )}
+              className="flex-1 flex flex-col items-center justify-center relative transition-all duration-200 active:scale-95"
             >
-              {Icon && <Icon className="h-5 w-5" />}
-              <span className="text-[10px] font-medium">{item.title}</span>
+              <div className={cn(
+                "flex items-center justify-center w-12 h-8 rounded-full mb-1 transition-all duration-300",
+                isActive 
+                  ? "bg-primary text-on-primary shadow-sm" 
+                  : "text-on-surface-variant hover:bg-on-surface/5"
+              )}>
+                {Icon && <Icon className={cn("h-5 w-5", isActive ? "stroke-[2.5px]" : "stroke-[1.5px]")} />}
+              </div>
+              <span className={cn(
+                "text-[10px] font-bold tracking-tight leading-tight text-center px-1 max-w-[80px] line-clamp-2",
+                isActive ? "text-primary" : "text-on-surface-variant"
+              )}>
+                {item.title}
+              </span>
             </Link>
           );
         })}

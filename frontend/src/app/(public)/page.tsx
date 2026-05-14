@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import WorldMap from "@/components/ui/world-map";
 
 const fadeIn = {
   initial: { opacity: 0, y: 20 },
@@ -42,7 +43,7 @@ export default function LandingPage() {
 
             {/* Description */}
             <motion.p variants={fadeIn} className="text-body-base text-on-surface-variant">
-              DisasterLink provides the federal command structure with real-time geospatial intelligence, multi-agency resource logistics, and unified communications for large-scale disaster management.
+              DisasterLink provides the national and state command structure with real-time geospatial intelligence, multi-agency resource logistics, and unified communications for large-scale disaster management across India.
             </motion.p>
 
             {/* CTAs */}
@@ -76,9 +77,9 @@ export default function LandingPage() {
               <div className="bg-surface-container-lowest/90 backdrop-blur-md p-4 rounded-lg border border-white/20">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="w-2 h-2 bg-error rounded-full animate-pulse" />
-                  <span className="text-label-caps text-on-surface">LIVE FEED: PACIFIC SECTOR</span>
+                  <span className="text-label-caps text-on-surface">LIVE FEED: WESTERN GHATS SECTOR</span>
                 </div>
-                <p className="text-mono-data text-on-surface-variant">GEO-SYNC: 34.0522° N, 118.2437° W</p>
+                <p className="text-mono-data text-on-surface-variant">GEO-SYNC: 18.5204° N, 73.8567° E</p>
               </div>
               <div className="flex gap-1">
                 <div className="w-24 h-12 bg-primary/20 backdrop-blur-sm rounded border border-primary/30" />
@@ -99,10 +100,10 @@ export default function LandingPage() {
         <div className="flex items-center gap-8 whitespace-nowrap overflow-x-auto max-w-[1440px] mx-auto">
           {[
             { label: "Active Incidents", value: "124", color: "text-error" },
-            { label: "Deployed Personnel", value: "12,842", color: "text-primary" },
-            { label: "Agency Capacity", value: "94.2%", color: "text-tertiary" },
+            { label: "Deployed NDRF/SDRF", value: "12,842", color: "text-primary" },
+            { label: "Shelter Capacity", value: "82.4%", color: "text-tertiary" },
             { label: "Network Integrity", value: "Optimal", color: "text-secondary" },
-            { label: "Last Sync", value: "0.04s Ago", color: "text-on-surface-variant" },
+            { label: "Last Sync (IST)", value: "0.04s Ago", color: "text-on-surface-variant" },
           ].map((stat, i, arr) => (
             <div
               key={stat.label}
@@ -133,12 +134,30 @@ export default function LandingPage() {
                 </div>
                 <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>public</span>
               </div>
-              <div className="bg-surface-dim h-48 rounded-lg overflow-hidden relative border border-outline-variant">
-                <div className="w-full h-full bg-gradient-to-br from-primary/10 via-surface-tint/5 to-surface-dim" />
-                <div className="absolute top-2 left-2 flex flex-col gap-1">
-                  <div className="bg-black/60 backdrop-blur-sm text-[10px] text-white px-2 py-0.5 rounded uppercase font-mono">Layer: Thermal</div>
-                  <div className="bg-black/60 backdrop-blur-sm text-[10px] text-white px-2 py-0.5 rounded uppercase font-mono">Tracking: On</div>
+              <div className="bg-surface-container-lowest h-48 rounded-lg overflow-hidden relative border border-outline-variant flex items-center justify-center">
+                <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
+                  <div className="bg-black/60 backdrop-blur-sm text-[10px] text-white px-2 py-0.5 rounded uppercase font-mono">Layer: Global Network</div>
+                  <div className="bg-black/60 backdrop-blur-sm text-[10px] text-white px-2 py-0.5 rounded uppercase font-mono">Nodes: Active</div>
                 </div>
+                <WorldMap
+                  dots={[
+                    // Asia to Africa
+                    { start: { lat: 28.6139, lng: 77.2090 }, end: { lat: -33.9249, lng: 18.4241 } }, // New Delhi to Cape Town
+                    // Africa to Antarctica
+                    { start: { lat: -33.9249, lng: 18.4241 }, end: { lat: -77.8463, lng: 166.6682 } }, // Cape Town to McMurdo Station
+                    // Antarctica to South America
+                    { start: { lat: -77.8463, lng: 166.6682 }, end: { lat: -15.8267, lng: -47.9218 } }, // McMurdo to Brasilia
+                    // South America to North America
+                    { start: { lat: -15.8267, lng: -47.9218 }, end: { lat: 38.9072, lng: -77.0369 } }, // Brasilia to Washington DC
+                    // North America to Europe
+                    { start: { lat: 38.9072, lng: -77.0369 }, end: { lat: 51.5074, lng: -0.1278 } }, // Washington DC to London
+                    // Europe to Oceania
+                    { start: { lat: 51.5074, lng: -0.1278 }, end: { lat: -33.8688, lng: 151.2093 } }, // London to Sydney
+                    // Oceania back to Asia
+                    { start: { lat: -33.8688, lng: 151.2093 }, end: { lat: 28.6139, lng: 77.2090 } }, // Sydney to New Delhi
+                  ]}
+                  lineColor="var(--color-primary)"
+                />
               </div>
             </div>
             <button className="mt-4 text-primary text-label-caps flex items-center gap-1 hover:underline">
@@ -156,7 +175,7 @@ export default function LandingPage() {
           >
             <span className="material-symbols-outlined text-error mb-4 block">emergency</span>
             <h3 className="text-title-sm mb-2">Emergency Coordination</h3>
-            <p className="text-body-sm text-on-surface-variant mb-4">Streamlined activation of federal resources and logistical chains during rapid escalation events.</p>
+            <p className="text-body-sm text-on-surface-variant mb-4">Streamlined activation of national and state resources during rapid escalation events like cyclones or floods.</p>
             <div className="space-y-2">
               <div className="flex justify-between items-center p-2 bg-surface-container rounded">
                 <span className="text-label-caps">Logistics</span>
@@ -182,10 +201,10 @@ export default function LandingPage() {
             <p className="text-body-sm text-on-surface-variant mb-4">Secure bridge for state, local, and federal data exchange with encrypted protocols.</p>
             <div className="flex -space-x-2 overflow-hidden">
               {[
-                { label: "FEMA", bg: "bg-secondary-container" },
-                { label: "NWS", bg: "bg-primary-fixed" },
-                { label: "USGS", bg: "bg-tertiary-fixed" },
-                { label: "+12", bg: "bg-surface-dim" },
+                { label: "NDMA", bg: "bg-secondary-container" },
+                { label: "IMD", bg: "bg-primary-fixed" },
+                { label: "NDRF", bg: "bg-tertiary-fixed" },
+                { label: "SDRF", bg: "bg-surface-dim" },
               ].map((a) => (
                 <div key={a.label} className={`inline-flex h-8 w-8 rounded-full ring-2 ring-white ${a.bg} items-center justify-center font-bold text-[10px]`}>
                   {a.label}
@@ -196,28 +215,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Command Center CTA */}
-      <section className="max-w-[1440px] mx-auto px-6 pb-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="bg-primary border border-outline rounded-xl p-8 text-on-primary flex flex-col md:flex-row items-center justify-between gap-8"
-        >
-          <div className="flex flex-col gap-2 max-w-2xl">
-            <h2 className="text-headline-md">Begin Agency Onboarding</h2>
-            <p className="text-body-base opacity-90">Secure authorization is required for full access to the DisasterLink National Command Center. Our systems meet FedRAMP High standards for data protection and operational continuity.</p>
-          </div>
-          <div className="flex gap-4 w-full md:w-auto">
-            <Link
-              href="/register"
-              className="bg-on-primary text-primary px-8 py-4 text-title-sm rounded-lg hover:bg-primary-container hover:text-on-primary-container transition-colors w-full md:w-auto text-center"
-            >
-              Request Credentials
-            </Link>
-          </div>
-        </motion.div>
-      </section>
     </div>
   );
 }

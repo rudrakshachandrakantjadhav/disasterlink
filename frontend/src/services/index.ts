@@ -30,6 +30,8 @@ export const alertService = {
 export const shelterService = {
   getAll: async (params?: { status?: string; district?: string }) =>
     api.get("/shelters", { params }),
+  getNearby: async (params: { latitude: number; longitude: number; radiusKm?: number }) =>
+    api.get("/shelters/nearby", { params }),
   getById: async (id: string) => api.get(`/shelters/${id}`),
   create: async (data: Record<string, unknown>) => api.post("/shelters", data),
   update: async (id: string, data: Record<string, unknown>) => api.patch(`/shelters/${id}`, data),
@@ -41,23 +43,24 @@ export const shelterService = {
 // VOLUNTEER SERVICE
 // ============================================
 export const volunteerService = {
-  getAll: async (params?: { status?: string; specialty?: string }) =>
-    api.get("/volunteers", { params }),
-  getById: async (id: string) => api.get(`/volunteers/${id}`),
-  deploy: async (id: string, data: { incidentId: string; sector: string }) =>
-    api.post(`/volunteers/${id}/deploy`, data),
-  updateStatus: async (id: string, status: string) =>
-    api.patch(`/volunteers/${id}/status`, { status }),
+  getTasks: async () => api.get("/volunteer/tasks"),
+  getStats: async () => api.get("/volunteer/stats"),
+  accept: async (sosId: string) => api.post(`/volunteer/accept/${sosId}`),
+  complete: async (sosId: string) => api.post(`/volunteer/complete/${sosId}`),
+  updateAvailability: async (isAvailable: boolean) =>
+    api.patch("/volunteer/availability", { isAvailable }),
 };
 
 // ============================================
 // SOS SERVICE
 // ============================================
 export const sosService = {
-  submit: async (data: Record<string, unknown>) => api.post("/sos", data),
-  getMyRequests: async () => api.get("/sos/me"),
+  submit: async (data: Record<string, unknown>) => api.post("/sos/create", data),
+  getMyRequests: async () => api.get("/sos/my"),
+  getNearby: async (params: { latitude: number; longitude: number; radiusKm?: number }) =>
+    api.get("/sos/nearby", { params }),
   getById: async (id: string) => api.get(`/sos/${id}`),
-  cancel: async (id: string) => api.patch(`/sos/${id}/cancel`),
+  updateStatus: async (id: string, status: string) => api.patch(`/sos/${id}/status`, { status }),
 };
 
 // ============================================
@@ -90,9 +93,8 @@ export const authService = {
 // MAP SERVICE
 // ============================================
 export const mapService = {
-  getIncidentPins: async () => api.get("/map/incidents"),
-  getShelterPins: async () => api.get("/map/shelters"),
-  getVolunteerPins: async () => api.get("/map/volunteers"),
+  getLive: async () => api.get("/map/live"),
+  getShelters: async (params?: { latitude?: number; longitude?: number; radiusKm?: number }) =>
+    api.get("/map/shelters", { params }),
   getHeatmapData: async () => api.get("/map/heatmap"),
-  getDistrictOverlays: async () => api.get("/map/districts"),
 };

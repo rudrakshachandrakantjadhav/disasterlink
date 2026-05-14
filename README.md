@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DisasterLink
 
-## Getting Started
+DisasterLink is a Next.js frontend with an Express, Prisma, and PostgreSQL backend.
 
-First, run the development server:
+## Get started with Neon
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+The backend is already configured for PostgreSQL through Prisma, so Neon only needs to provide the database connection string.
+
+1. Create a Neon project at https://console.neon.tech.
+2. In the Neon dashboard, click **Connect**, select your branch, database, and role, then copy the connection string.
+3. Put the connection string in `server/.env` as `DATABASE_URL`. Keep `sslmode=require` in the URL.
+
+```env
+DATABASE_URL="postgresql://<role>:<password>@<endpoint>.<region>.aws.neon.tech/<database>?sslmode=require"
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+For this Express API, a direct Neon connection string is fine for local development and Prisma commands. If you deploy into a serverless or high-concurrency environment, copy Neon's pooled connection string instead; it has `-pooler` in the hostname.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Then initialize the schema and demo data:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+cd server
+npm install
+npm run prisma:generate
+npm run prisma:push
+npm run seed
+```
 
-## Learn More
+Run the API and frontend in separate terminals:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+cd server
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The frontend expects `NEXT_PUBLIC_API_URL=http://localhost:5000/api` and the backend sample env allows requests from `http://localhost:3000`.

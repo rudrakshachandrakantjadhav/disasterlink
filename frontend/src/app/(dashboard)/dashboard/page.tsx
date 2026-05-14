@@ -37,7 +37,7 @@ export default function CitizenDashboard() {
               </div>
               <div className="p-4 bg-surface-container-low border-l-4 border-tertiary rounded-lg">
                 <p className="text-label-caps text-on-surface-variant mb-1">ISSUED 1 HOUR AGO</p>
-                <p className="text-title-sm text-on-surface">Power Outage Scheduled: North Sector</p>
+                <p className="text-title-sm text-on-surface">Power Outage Scheduled: North Mumbai Sector</p>
                 <p className="text-body-sm text-on-surface-variant">Grid maintenance from 14:00 - 16:00 UTC.</p>
               </div>
             </div>

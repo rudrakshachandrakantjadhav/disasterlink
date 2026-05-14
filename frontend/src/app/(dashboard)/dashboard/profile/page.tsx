@@ -17,8 +17,8 @@ export default function ProfilePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1"><label className="text-label-caps text-on-surface-variant">Full Name</label><input className="w-full p-4 border border-outline-variant rounded-lg focus:border-primary bg-surface-container-lowest text-body-base outline-none" defaultValue="Citizen John Doe" type="text"/></div>
               <div className="flex flex-col gap-1"><label className="text-label-caps text-on-surface-variant">Agency Email</label><input className="w-full p-4 border border-outline-variant rounded-lg focus:border-primary bg-surface-container-lowest text-body-base outline-none" defaultValue="j.doe@citizen.gov" type="email"/></div>
-              <div className="flex flex-col gap-1"><label className="text-label-caps text-on-surface-variant">Phone Number</label><input className="w-full p-4 border border-outline-variant rounded-lg focus:border-primary bg-surface-container-lowest text-body-base outline-none" defaultValue="+1 (555) 014-2900" type="tel"/></div>
-              <div className="flex flex-col gap-1"><label className="text-label-caps text-on-surface-variant">Registered District</label><input className="w-full p-4 border border-outline-variant rounded-lg bg-surface-container-low text-body-base outline-none" defaultValue="Central Coastal District" readOnly type="text"/></div>
+              <div className="flex flex-col gap-1"><label className="text-label-caps text-on-surface-variant">Phone Number</label><input className="w-full p-4 border border-outline-variant rounded-lg focus:border-primary bg-surface-container-lowest text-body-base outline-none" defaultValue="+91 98765 43210" type="tel"/></div>
+              <div className="flex flex-col gap-1"><label className="text-label-caps text-on-surface-variant">Registered District</label><input className="w-full p-4 border border-outline-variant rounded-lg bg-surface-container-low text-body-base outline-none" defaultValue="Konkan Coastal District" readOnly type="text"/></div>
             </div>
           </div>
 
@@ -26,7 +26,7 @@ export default function ProfilePage() {
           <div className="bg-surface-container-low border border-outline-variant p-6 rounded-xl">
             <div className="flex items-center gap-2 mb-4"><span className="material-symbols-outlined text-error">contact_emergency</span><h3 className="text-title-sm text-on-surface">Emergency Contact</h3></div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1"><label className="text-label-caps text-on-surface-variant">Contact Name</label><input className="w-full p-4 border border-outline-variant rounded-lg focus:border-primary bg-surface-container-lowest text-body-base outline-none" defaultValue="Jane Doe" type="text"/></div>
+              <div className="flex flex-col gap-1"><label className="text-label-caps text-on-surface-variant">Contact Name</label><input className="w-full p-4 border border-outline-variant rounded-lg focus:border-primary bg-surface-container-lowest text-body-base outline-none" defaultValue="Priya Sharma" type="text"/></div>
               <div className="flex flex-col gap-1"><label className="text-label-caps text-on-surface-variant">Relationship</label><select className="w-full p-4 border border-outline-variant rounded-lg focus:border-primary bg-surface-container-lowest text-body-base outline-none"><option>Spouse / Partner</option><option>Parent / Guardian</option></select></div>
             </div>
           </div>

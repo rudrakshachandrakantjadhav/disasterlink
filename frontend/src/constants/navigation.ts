@@ -29,8 +29,10 @@ export const adminNav: NavItem[] = [
   { title: "Incidents", href: "/admin/incidents", icon: "AlertTriangle" },
   { title: "Shelters", href: "/admin/shelters", icon: "Home" },
   { title: "Volunteers", href: "/admin/volunteers", icon: "Users" },
+  { title: "User Management", href: "/admin/users", icon: "Shield" },
   { title: "Analytics", href: "/admin/analytics", icon: "BarChart3" },
   { title: "Alert Commander", href: "/admin/notifications", icon: "Bell" },
+  { title: "Audit Logs", href: "/admin/audit", icon: "FileText" },
 ];
 
 export const SITE_CONFIG = {

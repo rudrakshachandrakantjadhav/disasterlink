@@ -91,10 +91,10 @@ export default function AnalyticsPage() {
             <thead className="border-b border-outline-variant"><tr>{["REGION", "INCIDENTS", "AVG RESPONSE", "SCORE"].map((h) => <th key={h} className="pb-2 text-label-caps text-on-surface-variant">{h}</th>)}</tr></thead>
             <tbody className="divide-y divide-outline-variant">
               {[
-                { region: "Central Coastal", incidents: 8, response: "12 min", score: "A" },
-                { region: "Northern Metro", incidents: 4, response: "18 min", score: "B+" },
-                { region: "Western Highland", incidents: 3, response: "22 min", score: "B" },
-                { region: "Southern Industrial", incidents: 2, response: "9 min", score: "A+" },
+                { region: "Konkan Coastal", incidents: 8, response: "12 min", score: "A" },
+                { region: "Mumbai Metro", incidents: 4, response: "18 min", score: "B+" },
+                { region: "Western Ghats", incidents: 3, response: "22 min", score: "B" },
+                { region: "Pune Industrial", incidents: 2, response: "9 min", score: "A+" },
               ].map((r) => (
                 <tr key={r.region}>
                   <td className="py-2 text-body-base">{r.region}</td>

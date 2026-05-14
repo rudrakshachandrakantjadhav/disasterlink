@@ -43,7 +43,7 @@ export default function VolunteerDashboard() {
             </div>
             <div className="divide-y divide-outline-variant">
               {[
-                { title: "Water Distribution: Sector C", priority: "HIGH", priorityBg: "bg-error-container text-on-error-container", location: "North Community Center", time: "Due in 2 hrs" },
+                { title: "Water Distribution: Sector C", priority: "HIGH", priorityBg: "bg-error-container text-on-error-container", location: "Andheri Sports Complex", time: "Due in 2 hrs" },
                 { title: "Shelter Setup: Arena B", priority: "MEDIUM", priorityBg: "bg-tertiary-container text-on-tertiary-container", location: "District Arena, Block 4", time: "Due in 5 hrs" },
                 { title: "Supply Inventory Check", priority: "LOW", priorityBg: "bg-surface-container-high text-on-surface-variant", location: "Central Warehouse", time: "Due tomorrow" },
               ].map((t) => (
@@ -71,7 +71,7 @@ export default function VolunteerDashboard() {
               <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(#6750a4 0.5px, transparent 0.5px)", backgroundSize: "32px 32px", opacity: 0.08 }} />
               <div className="absolute top-[30%] left-[40%]"><div className="w-5 h-5 bg-error rounded-full flex items-center justify-center"><span className="material-symbols-outlined text-white text-[14px]">priority_high</span></div></div>
               <div className="absolute top-[60%] left-[55%]"><div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center"><span className="material-symbols-outlined text-white text-[14px]">home_pin</span></div></div>
-              <div className="absolute bottom-3 left-3 bg-surface/90 backdrop-blur px-3 py-1.5 rounded-lg border border-outline-variant shadow"><span className="text-label-caps text-on-surface-variant">YOUR ZONE: SECTOR C-NORTH</span></div>
+              <div className="absolute bottom-3 left-3 bg-surface/90 backdrop-blur px-3 py-1.5 rounded-lg border border-outline-variant shadow"><span className="text-label-caps text-on-surface-variant">YOUR ZONE: ANDHERI WEST</span></div>
             </div>
           </div>
         </div>

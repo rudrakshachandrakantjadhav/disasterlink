@@ -6,14 +6,15 @@ import { createSosSchema, nearbySosSchema, updateSosStatusSchema } from "../vali
 import { sendSuccess, sendError } from "../utils/response.js";
 import { createSos } from "../services/sos.service.js";
 import { distanceKm } from "../services/distance.service.js";
-import { emitToRole, emitToUser } from "../sockets/index.js";
+import { emitToAdmins, emitToAll, emitToUser, emitToVolunteers } from "../sockets/index.js";
 
 export async function createSosRequest(req: Request, res: Response) {
   const input = createSosSchema.parse(req.body);
   const imageUrl = req.file ? await uploadImage(req.file.buffer) : undefined;
   const { sos, volunteers } = await createSos({ ...input, userId: req.user!.id, imageUrl });
-  emitToRole("volunteer", "new-sos", sos);
-  emitToRole("admin", "new-sos", sos);
+  emitToVolunteers("new-sos", sos);
+  emitToAdmins("new-sos", sos);
+  emitToAll("map-update", { type: "new-sos", payload: sos });
   return sendSuccess(res, { sos, notifiedVolunteers: volunteers.length }, "SOS created", 201);
 }
 
@@ -47,9 +48,10 @@ export async function updateSosStatus(req: Request, res: Response) {
     data: { status },
     include: { user: true, volunteer: { include: { user: true } } }
   });
-  emitToRole("admin", "sos-status-update", { sosId: sos.id, status });
+  emitToAdmins("sos-status-update", { sosId: sos.id, status });
   emitToUser(sos.userId, "sos-status-update", { sosId: sos.id, status });
-  if (status === SOSStatus.RESOLVED) emitToRole("admin", "rescue-completed", { sosId: sos.id });
+  emitToAll("map-update", { type: "sos-status-update", payload: sos });
+  if (status === SOSStatus.RESOLVED) emitToAdmins("rescue-completed", { sosId: sos.id });
   return sendSuccess(res, sos, "SOS status updated");
 }
 

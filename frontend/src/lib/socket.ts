@@ -1,0 +1,57 @@
+"use client";
+
+import { io, type Socket } from "socket.io-client";
+import type { UserRole } from "@/types";
+
+export type ServerToClientEvent =
+  | "connect"
+  | "disconnect"
+  | "new-sos"
+  | "volunteer-assigned"
+  | "emergency-alert"
+  | "sos-status-update"
+  | "rescue-completed"
+  | "map-update"
+  | "location-update";
+
+let socket: Socket | null = null;
+
+function getSocketUrl() {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+  return apiUrl.replace(/\/api\/?$/, "");
+}
+
+function normalizeSocketRole(role: UserRole | null) {
+  if (role === "citizen") return "survivor";
+  if (role === "district_admin" || role === "super_admin") return "admin";
+  return role;
+}
+
+export function getSocket() {
+  if (!socket) {
+    socket = io(getSocketUrl(), {
+      autoConnect: false,
+      transports: ["websocket", "polling"]
+    });
+  }
+
+  return socket;
+}
+
+export function connectSocket(user: { id: string; role: UserRole | null } | null) {
+  if (!user) return null;
+
+  const activeSocket = getSocket();
+  if (!activeSocket.connected) activeSocket.connect();
+
+  activeSocket.emit("join-room", {
+    userId: user.id,
+    role: normalizeSocketRole(user.role)
+  });
+
+  return activeSocket;
+}
+
+export function disconnectSocket() {
+  if (socket?.connected) socket.disconnect();
+}

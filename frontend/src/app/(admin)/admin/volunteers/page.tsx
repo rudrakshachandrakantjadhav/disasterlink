@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function VolunteersManagementPage() {
   const volunteers = [
-    { id: "VOL-104", name: "Sarah Mitchell", role: "Field Ops Lead", status: "Deployed", statusBg: "bg-primary text-on-primary", zone: "Sector C", cert: "First Aid, HazMat L2", hours: 142 },
+    { id: "VOL-104", name: "Priya Sharma", role: "Field Ops Lead", status: "Deployed", statusBg: "bg-primary text-on-primary", zone: "Sector C (Andheri)", cert: "First Aid, HazMat L2", hours: 142 },
     { id: "VOL-089", name: "James Chen", role: "Medical Responder", status: "Deployed", statusBg: "bg-primary text-on-primary", zone: "Arena B", cert: "EMT-B, First Aid", hours: 98 },
     { id: "VOL-156", name: "Maria Rodriguez", role: "Logistics Coordinator", status: "Available", statusBg: "bg-tertiary-container text-on-tertiary-container", zone: "—", cert: "Supply Chain", hours: 67 },
     { id: "VOL-201", name: "David Okonkwo", role: "Communications", status: "Off Duty", statusBg: "bg-surface-container-high text-on-surface-variant", zone: "—", cert: "Radio Ops", hours: 34 },

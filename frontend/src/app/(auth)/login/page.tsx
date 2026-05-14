@@ -23,6 +23,7 @@ export default function LoginPage() {
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -36,6 +37,9 @@ export default function LoginPage() {
     return newErrors;
   };
 
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [resolvedRole, setResolvedRole] = useState<string | null>(null);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const validationErrors = validate();
@@ -44,14 +48,33 @@ export default function LoginPage() {
       return;
     }
     setErrors({});
+    setAuthError(null);
     setIsLoading(true);
-    // Authenticate and redirect
-    await login(formData.identity, formData.password);
+
+    const result = await login(formData.identity, formData.password);
+
     setIsLoading(false);
+
+    if (!result.success) {
+      setSubmitStatus("error");
+      setAuthError(result.error || "Authentication failed. Access denied.");
+      return;
+    }
+
+    // Map role to display label
+    const roleLabels: Record<string, string> = {
+      citizen: "Citizen Portal",
+      volunteer: "Volunteer Operations",
+      admin: "Admin Command Center",
+      district_admin: "District Admin Operations",
+      super_admin: "Super Admin Control",
+    };
+    setResolvedRole(roleLabels[useAuthStore.getState().role || "citizen"] || "Dashboard");
     setSubmitStatus("success");
+
     setTimeout(() => {
-      router.push("/dashboard");
-    }, 1500);
+      router.push(result.redirectTo || "/dashboard");
+    }, 1800);
   };
 
   const handleChange = (field: string, value: string | boolean) => {
@@ -327,7 +350,35 @@ export default function LoginPage() {
               </span>
               <div>
                 <div style={{ fontSize: "14px", fontWeight: 600, color: "#166534" }}>Authentication Successful</div>
-                <div style={{ fontSize: "12px", color: "#15803d" }}>Redirecting to command dashboard…</div>
+                <div style={{ fontSize: "12px", color: "#15803d" }}>Redirecting to {resolvedRole || "dashboard"}…</div>
+              </div>
+            </div>
+          )}
+
+          {/* Error state */}
+          {submitStatus === "error" && authError && (
+            <div
+              style={{
+                background: "#FEF2F2",
+                border: "1px solid #FECACA",
+                borderRadius: "12px",
+                padding: "16px 20px",
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                marginBottom: "24px",
+              }}
+            >
+              <span
+                className="material-symbols-outlined"
+                style={{ color: "#DC2626", fontSize: "22px" }}
+                aria-hidden="true"
+              >
+                gpp_bad
+              </span>
+              <div>
+                <div style={{ fontSize: "14px", fontWeight: 600, color: "#991B1B" }}>Access Denied</div>
+                <div style={{ fontSize: "12px", color: "#B91C1C" }}>{authError}</div>
               </div>
             </div>
           )}
@@ -669,6 +720,26 @@ export default function LoginPage() {
             </span>
             Sign in with Agency SSO
           </button>
+
+          {/* Register Link */}
+          <div style={{ marginTop: "24px", textAlign: "center" }}>
+            <p style={{ fontSize: "13px", color: "#5A6B7A" }}>
+              Do not have agency credentials?{" "}
+              <Link
+                href="/register"
+                style={{
+                  color: "#0B1F33",
+                  fontWeight: 600,
+                  textDecoration: "none",
+                  transition: "color 0.15s",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.textDecoration = "underline")}
+                onMouseLeave={(e) => (e.currentTarget.style.textDecoration = "none")}
+              >
+                Register Now
+              </Link>
+            </p>
+          </div>
 
           {/* Footer */}
           <footer style={{ marginTop: "32px", paddingTop: "24px", borderTop: "1px solid #E2E8F0" }}>

@@ -13,6 +13,7 @@ import { volunteerRouter } from "./routes/volunteer.routes.js";
 import { shelterRouter } from "./routes/shelter.routes.js";
 import { alertRouter } from "./routes/alert.routes.js";
 import { adminRouter } from "./routes/admin.routes.js";
+import { mapRouter } from "./routes/map.routes.js";
 import { initSocket } from "./sockets/index.js";
 
 const app = express();
@@ -31,6 +32,7 @@ app.use("/api/volunteer", volunteerRouter);
 app.use("/api/shelters", shelterRouter);
 app.use("/api/alerts", alertRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api/map", mapRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

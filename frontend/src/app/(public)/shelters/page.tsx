@@ -2,9 +2,9 @@
 
 export default function SheltersPage() {
   const shelters = [
-    { name: "Northside Community Center", address: "1204 Oak Street, North Sector • 1.2 mi", status: "CRITICAL LOAD", statusBg: "bg-error-container text-on-error-container", occupancy: 94, total: "470/500", food: 30, water: 65, medical: 10 },
+    { name: "Dadar Community Hall", address: "Dr Ambedkar Road, Dadar • 1.2 km", status: "CRITICAL LOAD", statusBg: "bg-error-container text-on-error-container", occupancy: 94, total: "470/500", food: 30, water: 65, medical: 10 },
     { name: "St. Jude Regional Hall", address: "45 Broad Ave, Downtown • 3.5 mi", status: "STABLE", statusBg: "bg-secondary-container text-on-secondary-container", occupancy: 42, total: "210/500", food: 85, water: 90, medical: 75 },
-    { name: "Unity Plaza Sports Complex", address: "88 Stadium Drive, South Sector • 5.1 mi", status: "HIGH CAPACITY", statusBg: "bg-primary-container/20 text-primary", occupancy: 15, total: "180/1200", food: 95, water: 95, medical: 90 },
+    { name: "Balewadi Sports Complex", address: "Mumbai-Bengaluru Highway, Pune • 5.1 km", status: "HIGH CAPACITY", statusBg: "bg-primary-container/20 text-primary", occupancy: 15, total: "180/1200", food: 95, water: 95, medical: 90 },
   ];
 
   const getBarColor = (val: number) => val < 25 ? "bg-error" : val < 50 ? "bg-tertiary" : "bg-primary";

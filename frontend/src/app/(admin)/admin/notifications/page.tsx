@@ -4,8 +4,8 @@ import Link from "next/link";
 
 export default function NotificationsPage() {
   const broadcasts = [
-    { id: "BC-401", title: "Evacuation Order: Central Coastal District", type: "EMERGENCY", typeBg: "bg-error text-on-error", sent: "2 min ago", reach: "12,842", channel: "SMS + Push + Radio" },
-    { id: "BC-400", title: "Power Outage Advisory: North Sector", type: "WARNING", typeBg: "bg-tertiary-container text-on-tertiary-container", sent: "1 hr ago", reach: "3,200", channel: "Push Notification" },
+    { id: "BC-401", title: "Evacuation Order: Konkan Coastal District", type: "EMERGENCY", typeBg: "bg-error text-on-error", sent: "2 min ago", reach: "12,842", channel: "SMS + Push + Radio" },
+    { id: "BC-400", title: "Power Outage Advisory: North Mumbai Sector", type: "WARNING", typeBg: "bg-tertiary-container text-on-tertiary-container", sent: "1 hr ago", reach: "3,200", channel: "Push Notification" },
     { id: "BC-399", title: "Shelter Opening: Unity Plaza", type: "INFO", typeBg: "bg-primary-container/20 text-primary", sent: "3 hrs ago", reach: "8,500", channel: "Push + Email" },
   ];
 
@@ -21,7 +21,7 @@ export default function NotificationsPage() {
         <h3 className="text-title-sm text-on-surface mb-4 flex items-center gap-2"><span className="material-symbols-outlined text-primary">edit_notifications</span>Quick Broadcast</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div className="flex flex-col gap-1"><label className="text-label-caps text-on-surface-variant">Alert Type</label><select className="p-3 border border-outline-variant rounded-lg bg-surface-container-lowest text-body-base outline-none focus:border-primary"><option>Emergency</option><option>Warning</option><option>Info</option></select></div>
-          <div className="flex flex-col gap-1"><label className="text-label-caps text-on-surface-variant">Target Region</label><select className="p-3 border border-outline-variant rounded-lg bg-surface-container-lowest text-body-base outline-none focus:border-primary"><option>All Districts</option><option>Central Coastal</option><option>Northern Metro</option></select></div>
+          <div className="flex flex-col gap-1"><label className="text-label-caps text-on-surface-variant">Target Region</label><select className="p-3 border border-outline-variant rounded-lg bg-surface-container-lowest text-body-base outline-none focus:border-primary"><option>All Districts</option><option>Konkan Coastal</option><option>Mumbai Metro</option></select></div>
           <div className="flex flex-col gap-1"><label className="text-label-caps text-on-surface-variant">Channels</label><select className="p-3 border border-outline-variant rounded-lg bg-surface-container-lowest text-body-base outline-none focus:border-primary"><option>All Channels</option><option>SMS Only</option><option>Push Only</option></select></div>
         </div>
         <div className="flex flex-col gap-1 mb-4"><label className="text-label-caps text-on-surface-variant">Message</label><textarea className="p-3 border border-outline-variant rounded-lg bg-surface-container-lowest text-body-base outline-none focus:border-primary" rows={3} placeholder="Enter broadcast message..." /></div>

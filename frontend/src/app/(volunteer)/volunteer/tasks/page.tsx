@@ -1,53 +1,254 @@
 "use client";
 
 import Link from "next/link";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { CheckCircle2, Clock, MapPin, Radio, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
+import { volunteerService } from "@/services";
+import { useSocket } from "@/hooks/useSocket";
+import { cn } from "@/lib/utils";
+
+interface ApiEnvelope<T> {
+  data: T;
+}
+
+interface VolunteerTask {
+  id: string;
+  type: string;
+  severity: string;
+  status: string;
+  description?: string | null;
+  latitude: number;
+  longitude: number;
+  createdAt: string;
+  user?: {
+    name?: string;
+    phone?: string;
+  };
+}
+
+function priorityClass(severity: string) {
+  const normalized = severity.toLowerCase();
+  if (normalized === "critical" || normalized === "high") return "bg-error-container text-on-error-container";
+  if (normalized === "medium") return "bg-tertiary-container text-on-tertiary-container";
+  return "bg-surface-container-high text-on-surface-variant";
+}
+
+function statusClass(status: string) {
+  if (status === "RESOLVED") return "bg-surface-container-high text-outline";
+  if (status === "ASSIGNED" || status === "IN_PROGRESS") return "bg-primary text-on-primary";
+  return "bg-tertiary-container text-on-tertiary-container";
+}
 
 export default function VolunteerTasksPage() {
-  const tasks = [
-    { id: "TSK-401", title: "Water Distribution: Sector C", priority: "HIGH", priorityBg: "bg-error-container text-on-error-container", status: "In Progress", statusBg: "bg-primary text-on-primary", location: "North Community Center", assigned: "Team Alpha", due: "Today, 14:00", desc: "Distribute 500 water bottles to affected families in Zone C-3." },
-    { id: "TSK-398", title: "Shelter Setup: Arena B", priority: "MEDIUM", priorityBg: "bg-tertiary-container text-on-tertiary-container", status: "Pending", statusBg: "bg-tertiary-container text-on-tertiary-container", location: "District Arena, Block 4", assigned: "You + 3 others", due: "Today, 18:00", desc: "Set up 200 cots and organize intake station at the arena." },
-    { id: "TSK-395", title: "Supply Inventory Check", priority: "LOW", priorityBg: "bg-surface-container-high text-on-surface-variant", status: "Queued", statusBg: "bg-surface-container-high text-on-surface-variant", location: "Central Warehouse", assigned: "Solo", due: "Tomorrow, 08:00", desc: "Complete physical count of all emergency supply categories." },
-    { id: "TSK-390", title: "First Aid Station Coverage", priority: "MEDIUM", priorityBg: "bg-tertiary-container text-on-tertiary-container", status: "Completed", statusBg: "bg-surface-container-high text-outline", location: "St. Mary's Center", assigned: "Med Team", due: "Yesterday", desc: "12-hour shift at primary first aid station." },
-  ];
+  const { on, isConnected } = useSocket();
+  const [tasks, setTasks] = useState<VolunteerTask[]>([]);
+  const [incoming, setIncoming] = useState<VolunteerTask[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadTasks = useCallback(async () => {
+    try {
+      setError(null);
+      const response = await volunteerService.getTasks();
+      setTasks((response.data as ApiEnvelope<VolunteerTask[]>).data || []);
+    } catch {
+      setError("Volunteer tasks could not be loaded.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadTasks();
+  }, [loadTasks]);
+
+  useEffect(() => {
+    const offNewSos = on<VolunteerTask>("new-sos", (payload) => {
+      setIncoming((current) => [payload, ...current.filter((task) => task.id !== payload.id)].slice(0, 5));
+      toast.warning("New SOS nearby", {
+        description: `${payload.type} request marked ${payload.severity}`
+      });
+    });
+
+    const offAssigned = on("volunteer-assigned", () => {
+      loadTasks();
+    });
+
+    const offStatus = on("sos-status-update", () => {
+      loadTasks();
+    });
+
+    return () => {
+      offNewSos();
+      offAssigned();
+      offStatus();
+    };
+  }, [loadTasks, on]);
+
+  const stats = useMemo(() => {
+    const active = tasks.filter((task) => task.status === "ASSIGNED" || task.status === "IN_PROGRESS").length;
+    const pending = incoming.length;
+    const completed = tasks.filter((task) => task.status === "RESOLVED").length;
+    return { total: tasks.length + incoming.length, active, pending, completed };
+  }, [incoming.length, tasks]);
+
+  const acceptTask = async (taskId: string) => {
+    setBusyId(taskId);
+    try {
+      await volunteerService.accept(taskId);
+      setIncoming((current) => current.filter((task) => task.id !== taskId));
+      await loadTasks();
+      toast.success("Task accepted");
+    } catch {
+      toast.error("Could not accept task");
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const completeTask = async (taskId: string) => {
+    setBusyId(taskId);
+    try {
+      await volunteerService.complete(taskId);
+      await loadTasks();
+      toast.success("Task completed");
+    } catch {
+      toast.error("Could not complete task");
+    } finally {
+      setBusyId(null);
+    }
+  };
 
   return (
     <main className="flex-grow max-w-[1440px] mx-auto w-full px-4 md:px-8 py-6">
-      <div className="flex items-center justify-between mb-6">
-        <div><h1 className="text-display-lg text-primary">Task Assignments</h1><p className="text-body-base text-on-surface-variant">View and manage your current field operation tasks.</p></div>
-        <button className="bg-primary text-on-primary px-6 py-3 rounded-lg text-label-caps hover:opacity-90 transition-opacity flex items-center gap-2"><span className="material-symbols-outlined">add_task</span>REQUEST TASK</button>
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-display-lg text-primary">Task Assignments</h1>
+          <p className="text-body-base text-on-surface-variant">Live assignments and nearby SOS requests from dispatch.</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className={cn("text-label-caps px-3 py-2 rounded-md", isConnected ? "bg-primary text-on-primary" : "bg-surface-container-high text-on-surface-variant")}>
+            {isConnected ? "SOCKET LIVE" : "SOCKET OFFLINE"}
+          </span>
+          <button
+            onClick={loadTasks}
+            className="bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-md text-label-caps hover:bg-surface-container-highest transition-colors flex items-center gap-2"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Refresh
+          </button>
+        </div>
       </div>
 
-      {/* Summary */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-surface-container-lowest border border-outline-variant p-4 rounded-xl"><p className="text-label-caps text-on-surface-variant">TOTAL TASKS</p><p className="text-headline-md font-mono text-primary">8</p></div>
-        <div className="bg-surface-container-lowest border border-outline-variant p-4 rounded-xl"><p className="text-label-caps text-on-surface-variant">IN PROGRESS</p><p className="text-headline-md font-mono text-primary">1</p></div>
-        <div className="bg-surface-container-lowest border border-outline-variant p-4 rounded-xl"><p className="text-label-caps text-on-surface-variant">PENDING</p><p className="text-headline-md font-mono text-tertiary">2</p></div>
-        <div className="bg-surface-container-lowest border border-outline-variant p-4 rounded-xl"><p className="text-label-caps text-on-surface-variant">COMPLETED</p><p className="text-headline-md font-mono text-outline">5</p></div>
+        <div className="bg-surface-container-lowest border border-outline-variant p-4 rounded-md"><p className="text-label-caps text-on-surface-variant">TOTAL TASKS</p><p className="text-headline-md font-mono text-primary">{stats.total}</p></div>
+        <div className="bg-surface-container-lowest border border-outline-variant p-4 rounded-md"><p className="text-label-caps text-on-surface-variant">ACTIVE</p><p className="text-headline-md font-mono text-primary">{stats.active}</p></div>
+        <div className="bg-surface-container-lowest border border-outline-variant p-4 rounded-md"><p className="text-label-caps text-on-surface-variant">INCOMING</p><p className="text-headline-md font-mono text-tertiary">{stats.pending}</p></div>
+        <div className="bg-surface-container-lowest border border-outline-variant p-4 rounded-md"><p className="text-label-caps text-on-surface-variant">COMPLETED</p><p className="text-headline-md font-mono text-outline">{stats.completed}</p></div>
       </div>
 
-      {/* Task Cards */}
-      <div className="space-y-4">
-        {tasks.map((t) => (
-          <div key={t.id} className={`bg-surface-container-lowest border border-outline-variant rounded-xl p-6 hover:shadow-md transition-shadow ${t.status === "Completed" ? "opacity-60" : ""}`}>
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-3">
-              <div className="flex items-center gap-3">
-                <span className={`${t.priorityBg} text-label-caps px-2 py-1 rounded`}>{t.priority}</span>
-                <span className={`${t.statusBg} text-label-caps px-2 py-1 rounded`}>{t.status}</span>
-                <span className="text-mono-data text-on-surface-variant">{t.id}</span>
-              </div>
-              <span className="text-mono-data text-on-surface-variant">{t.due}</span>
-            </div>
-            <h3 className="text-title-sm text-on-surface mb-1">{t.title}</h3>
-            <p className="text-body-sm text-on-surface-variant mb-3">{t.desc}</p>
-            <div className="flex items-center gap-6 text-body-sm text-on-surface-variant">
-              <span className="flex items-center gap-1"><span className="material-symbols-outlined text-sm">location_on</span>{t.location}</span>
-              <span className="flex items-center gap-1"><span className="material-symbols-outlined text-sm">group</span>{t.assigned}</span>
-            </div>
+      {error && (
+        <div className="mb-4 rounded-md border border-error/30 bg-error-container p-3 text-body-sm text-on-error-container">
+          {error}
+        </div>
+      )}
+
+      {incoming.length > 0 && (
+        <section className="mb-6">
+          <h2 className="text-title-sm text-on-surface mb-3 flex items-center gap-2">
+            <Radio className="h-5 w-5 text-error" />
+            Incoming SOS
+          </h2>
+          <div className="space-y-3">
+            {incoming.map((task) => (
+              <TaskCard
+                key={task.id}
+                task={task}
+                actionLabel="Accept"
+                disabled={busyId === task.id}
+                onAction={() => acceptTask(task.id)}
+              />
+            ))}
           </div>
-        ))}
-      </div>
+        </section>
+      )}
 
-      <div className="mt-6"><Link href="/volunteer" className="text-on-surface-variant hover:text-primary transition-colors inline-flex items-center gap-1 text-body-sm"><span className="material-symbols-outlined text-sm">arrow_back</span>Back to Volunteer Hub</Link></div>
+      <section>
+        <h2 className="text-title-sm text-on-surface mb-3 flex items-center gap-2">
+          <Clock className="h-5 w-5 text-primary" />
+          Assigned Tasks
+        </h2>
+        <div className="space-y-4">
+          {isLoading && <div className="text-body-sm text-on-surface-variant">Loading tasks...</div>}
+          {!isLoading && tasks.length === 0 && (
+            <div className="bg-surface-container-lowest border border-outline-variant rounded-md p-6 text-body-sm text-on-surface-variant">
+              No assigned tasks yet. New SOS requests will appear here when dispatch assigns them or when a live request arrives.
+            </div>
+          )}
+          {tasks.map((task) => (
+            <TaskCard
+              key={task.id}
+              task={task}
+              actionLabel="Complete"
+              disabled={busyId === task.id || task.status === "RESOLVED"}
+              onAction={() => completeTask(task.id)}
+            />
+          ))}
+        </div>
+      </section>
+
+      <div className="mt-6">
+        <Link href="/volunteer" className="text-on-surface-variant hover:text-primary transition-colors inline-flex items-center gap-1 text-body-sm">
+          Back to Volunteer Hub
+        </Link>
+      </div>
     </main>
+  );
+}
+
+function TaskCard({
+  task,
+  actionLabel,
+  disabled,
+  onAction
+}: {
+  task: VolunteerTask;
+  actionLabel: string;
+  disabled?: boolean;
+  onAction: () => void;
+}) {
+  return (
+    <div className={cn("bg-surface-container-lowest border border-outline-variant rounded-md p-6 hover:shadow-md transition-shadow", task.status === "RESOLVED" && "opacity-60")}>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <span className={cn("text-label-caps px-2 py-1 rounded", priorityClass(task.severity))}>{task.severity}</span>
+          <span className={cn("text-label-caps px-2 py-1 rounded", statusClass(task.status))}>{task.status.replaceAll("_", " ")}</span>
+          <span className="text-mono-data text-on-surface-variant">{task.id.slice(0, 8)}</span>
+        </div>
+        <span className="text-mono-data text-on-surface-variant">{new Date(task.createdAt).toLocaleString()}</span>
+      </div>
+      <h3 className="text-title-sm text-on-surface mb-1">{task.type} SOS</h3>
+      <p className="text-body-sm text-on-surface-variant mb-3">{task.description || "No description provided."}</p>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-6 text-body-sm text-on-surface-variant">
+          <span className="flex items-center gap-1">
+            <MapPin className="h-4 w-4" />
+            {task.latitude.toFixed(4)}, {task.longitude.toFixed(4)}
+          </span>
+          {task.user?.name && <span>Requester: {task.user.name}</span>}
+        </div>
+        <button
+          onClick={onAction}
+          disabled={disabled}
+          className="bg-primary text-on-primary px-4 py-2 rounded-md text-label-caps hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+        >
+          <CheckCircle2 className="h-4 w-4" />
+          {actionLabel}
+        </button>
+      </div>
+    </div>
   );
 }

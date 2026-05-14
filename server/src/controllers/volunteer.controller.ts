@@ -3,7 +3,7 @@ import { SOSStatus } from "@prisma/client";
 import { prisma } from "../config/database.js";
 import { acceptSosTask } from "../services/volunteer.service.js";
 import { sendSuccess, sendError } from "../utils/response.js";
-import { emitToRole, emitToUser } from "../sockets/index.js";
+import { emitToAdmins, emitToAll, emitToUser } from "../sockets/index.js";
 
 export async function tasks(req: Request, res: Response) {
   const volunteer = await prisma.volunteer.findUnique({ where: { userId: req.user!.id } });
@@ -18,8 +18,9 @@ export async function tasks(req: Request, res: Response) {
 
 export async function acceptTask(req: Request, res: Response) {
   const sos = await acceptSosTask(String(req.params.id), req.user!.id);
-  emitToRole("admin", "volunteer-assigned", { sosId: sos.id, volunteer: sos.volunteer });
+  emitToAdmins("volunteer-assigned", { sosId: sos.id, volunteer: sos.volunteer });
   emitToUser(sos.userId, "volunteer-assigned", { sosId: sos.id, volunteer: sos.volunteer });
+  emitToAll("map-update", { type: "volunteer-assigned", payload: sos });
   return sendSuccess(res, sos, "Task accepted");
 }
 
@@ -31,8 +32,9 @@ export async function completeTask(req: Request, res: Response) {
     data: { status: SOSStatus.RESOLVED },
     include: { user: true }
   });
-  emitToRole("admin", "rescue-completed", { sosId: sos.id });
+  emitToAdmins("rescue-completed", { sosId: sos.id });
   emitToUser(sos.userId, "rescue-completed", { sosId: sos.id });
+  emitToAll("map-update", { type: "rescue-completed", payload: sos });
   return sendSuccess(res, sos, "Task completed");
 }
 

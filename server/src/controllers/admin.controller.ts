@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import { SOSStatus, Severity } from "@prisma/client";
 import { prisma } from "../config/database.js";
 import { sendSuccess } from "../utils/response.js";
-import { emitToRole } from "../sockets/index.js";
+import { emitEmergencyAlert } from "../sockets/index.js";
 
 export async function analytics(_req: Request, res: Response) {
   const [openIncidents, resolvedIncidents, volunteers, shelters, critical] = await Promise.all([
@@ -32,8 +32,7 @@ export async function volunteers(_req: Request, res: Response) {
 export async function broadcast(req: Request, res: Response) {
   const { title = "Emergency broadcast", message = "" } = req.body as { title?: string; message?: string };
   const payload = { title, message, createdAt: new Date().toISOString() };
-  emitToRole("survivor", "emergency-alert", payload);
-  emitToRole("volunteer", "emergency-alert", payload);
+  emitEmergencyAlert(payload);
   return sendSuccess(res, payload, "Broadcast sent");
 }
 

@@ -4,10 +4,10 @@ import Link from "next/link";
 
 export default function IncidentsPage() {
   const incidents = [
-    { id: "INC-2041", title: "Flash Flooding: Central Coastal", severity: "CRITICAL", severityBg: "bg-error text-on-error", region: "Central Coastal", status: "Active", teams: 12, affected: 4200, updated: "2 min ago" },
-    { id: "INC-2040", title: "Power Grid Instability", severity: "HIGH", severityBg: "bg-tertiary-container text-on-tertiary-container", region: "Northern Metro", status: "Monitoring", teams: 4, affected: 890, updated: "14 min ago" },
-    { id: "INC-2039", title: "Road Closure: Highway 12", severity: "MEDIUM", severityBg: "bg-surface-container-high text-on-surface-variant", region: "Western Highland", status: "Ongoing", teams: 2, affected: 320, updated: "28 min ago" },
-    { id: "INC-2038", title: "Gas Leak: Industrial Zone B", severity: "LOW", severityBg: "bg-surface-container-high text-outline", region: "Southern Industrial", status: "Resolved", teams: 1, affected: 45, updated: "1 hr ago" },
+    { id: "INC-2041", title: "Flash Flooding: Konkan Coastal", severity: "CRITICAL", severityBg: "bg-error text-on-error", region: "Konkan Coastal", status: "Active", teams: 12, affected: 4200, updated: "2 min ago" },
+    { id: "INC-2040", title: "Power Grid Instability", severity: "HIGH", severityBg: "bg-tertiary-container text-on-tertiary-container", region: "Mumbai Metro", status: "Monitoring", teams: 4, affected: 890, updated: "14 min ago" },
+    { id: "INC-2039", title: "Road Closure: NH-48", severity: "MEDIUM", severityBg: "bg-surface-container-high text-on-surface-variant", region: "Western Ghats", status: "Ongoing", teams: 2, affected: 320, updated: "28 min ago" },
+    { id: "INC-2038", title: "Gas Leak: Industrial Zone B", severity: "LOW", severityBg: "bg-surface-container-high text-outline", region: "Pune Industrial", status: "Resolved", teams: 1, affected: 45, updated: "1 hr ago" },
   ];
 
   return (

@@ -48,10 +48,10 @@ export default function AlertsPage() {
             <h2 className="text-label-caps text-on-surface-variant mb-2">DISTRICT / REGION</h2>
             <select className="w-full bg-surface-container-low border border-outline-variant rounded p-2 text-body-base focus:ring-2 focus:ring-primary outline-none">
               <option>All Districts</option>
-              <option>Northern Metropolitan</option>
-              <option>Central Coastal</option>
-              <option>Western Highlands</option>
-              <option>Southern Industrial</option>
+              <option>Mumbai Metropolitan</option>
+              <option>Konkan Coastal</option>
+              <option>Western Ghats</option>
+              <option>Pune Industrial</option>
             </select>
             <div className="mt-4 flex flex-wrap gap-1">
               {["Zone A-4", "Zone B-1", "Zone C-2"].map((z) => (
@@ -97,8 +97,8 @@ export default function AlertsPage() {
                 </div>
                 <span className="text-on-surface-variant text-mono-data">2 MINS AGO</span>
               </div>
-              <h2 className="text-headline-md text-on-background mb-2">Immediate Evacuation: Central Coastal District</h2>
-              <p className="text-body-base text-on-surface-variant mb-4 leading-relaxed">Severe storm surge and flash flooding imminent for all low-lying areas in the Central Coastal District. Residents in Zone A-4 and B-1 must evacuate to designated shelters immediately.</p>
+              <h2 className="text-headline-md text-on-background mb-2">Immediate Evacuation: Konkan Coastal District</h2>
+              <p className="text-body-base text-on-surface-variant mb-4 leading-relaxed">Severe storm surge and flash flooding imminent for all low-lying areas in the Konkan Coastal District. Residents in Zone A-4 and B-1 must evacuate to designated shelters immediately.</p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-outline-variant pt-4">
                 <div className="flex items-center gap-2"><span className="material-symbols-outlined text-error">water_damage</span><div><p className="text-label-caps text-on-surface-variant">THREAT TYPE</p><p className="text-body-sm font-bold">Severe Flooding</p></div></div>
                 <div className="flex items-center gap-2"><span className="material-symbols-outlined text-primary">location_on</span><div><p className="text-label-caps text-on-surface-variant">AFFECTED REGION</p><p className="text-body-sm font-bold">Zones A-4, B-1, C-2</p></div></div>
@@ -113,7 +113,7 @@ export default function AlertsPage() {
                 <span className="text-on-surface-variant text-mono-data">14 MINS AGO</span>
               </div>
               <h3 className="text-title-sm mb-1">Grid Instability Detected</h3>
-              <p className="text-body-sm text-on-surface-variant mb-4">Localized power outages reported in Northern Metropolitan area. Maintenance crews dispatched.</p>
+              <p className="text-body-sm text-on-surface-variant mb-4">Localized power outages reported in Mumbai Metropolitan area. Maintenance crews dispatched.</p>
               <a className="text-primary text-label-caps flex items-center gap-1 hover:underline" href="#">VIEW DETAILS <span className="material-symbols-outlined text-[14px]">arrow_forward</span></a>
             </div>
 
@@ -138,7 +138,7 @@ export default function AlertsPage() {
                 <span className="text-on-surface-variant text-mono-data">1 HOUR AGO</span>
               </div>
               <h3 className="text-title-sm mb-1">Water Quality Cleared</h3>
-              <p className="text-body-sm text-on-surface-variant mb-4">Boil water advisory lifted for Western Highlands. Normal usage can resume.</p>
+              <p className="text-body-sm text-on-surface-variant mb-4">Boil water advisory lifted for Western Ghats. Normal usage can resume.</p>
               <div className="flex items-center gap-2 text-outline"><span className="material-symbols-outlined text-[18px]">verified</span><span className="text-label-caps">RESOLVED</span></div>
             </div>
 
@@ -180,7 +180,7 @@ export default function AlertsPage() {
                   <tr className="bg-surface-container-lowest hover:bg-surface-container-low transition-colors h-10">
                     <td className="px-4 py-2 font-mono text-body-sm">13:22</td>
                     <td className="px-4 py-2 text-body-sm">Road Closure: Hwy 12</td>
-                    <td className="px-4 py-2 text-body-sm">Western High</td>
+                    <td className="px-4 py-2 text-body-sm">Western Ghats</td>
                     <td className="px-4 py-2"><span className="bg-error-container text-on-error-container text-[10px] px-2 py-0.5 rounded font-bold uppercase">High</span></td>
                     <td className="px-4 py-2 text-body-sm font-bold text-primary">Active</td>
                   </tr>
